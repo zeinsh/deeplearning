@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # version 1
 
 from collections import Counter, defaultdict
@@ -21,8 +23,8 @@ class Dictionary:
         word2cnt = Counter(words)
         if not os.path.exists('preprocessed'): os.mkdir('preprocessed')
         with codecs.open('{}/{}'.format(fpath,fname), 'w', 'utf-8') as fout:
-            fout.write("{}\t1000000000\n{}\t1000000000\n{}\t1000000000".format(
-                    "<PAD>", "<UNK>" , "<START>"))
+            fout.write("{}\t1000000000\n{}\t1000000000\n{}\t1000000000\n{}\t1000000000".format(
+                    "<PAD>", "<UNK>" , "<START>",'.'))
             for word, cnt in word2cnt.most_common(len(word2cnt)):
                 fout.write(u"{}\t{}\n".format(word, cnt))
     def load_vocab(self,path,filename):

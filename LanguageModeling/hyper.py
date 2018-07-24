@@ -1,8 +1,8 @@
 class HyperParameters:
-    DATAPATH='./data/shakespeare/'
+    DATAPATH='./data/sport/'
     VOCPATH='./preprocessed'
-    VOCFILE='articles.voc'
-    MODEL_CHKPNT_PATH='./model/RNN_LSTM_V1_2.ckpt'
+    VOCFILE='bbc_sports.voc'
+    MODEL_CHKPNT_PATH='./model/RNN_LSTM_V1_3.ckpt'
 
     MAXLENGTH=1000  # MAX Length of the document
     K=3 # beam search
@@ -10,7 +10,7 @@ class HyperParameters:
     embedding_dim=200
     
     batch_size = 1
-    n_epochs = 500
+    n_epochs = 50
     learning_rate = 0.01
     learning_rate_decay = 1#.41
     dropout_keep_probability = 0.6

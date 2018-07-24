@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # version 1
 """
 text conversion functions added
@@ -62,6 +64,7 @@ def convert_text(text,puncs=True,escapes=True):
     ret=text
     if puncs:ret=convert_puncs(ret)
     if escapes:ret=convert_escapes(ret)
+    
     return ret
 
 if __name__ == "__main__":

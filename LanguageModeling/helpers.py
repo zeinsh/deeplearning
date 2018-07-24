@@ -43,6 +43,7 @@ def batches_generator(batch_size, docs,dictionary,
             y[n, :utt_len] = y_list[n]
         yield x, y, lengths
 
+
 class Beam:
     def __init__(self,K):
         self.state_c=[]
@@ -60,7 +61,11 @@ class Beam:
         current_hist.extend(lastOutput)
         self.history.append(current_hist)
     def getTopK(self):
-        topK=np.argsort(self.probabilities)[-self.K:]
+        #topK=np.argsort(self.probabilities)[-self.K:]
+        pr=np.array(self.probabilities)
+        pr=pr+0.0001
+        pr=pr/pr.sum()
+        topK=np.random.choice(len(self.probabilities), self.K, p=pr)
         lenTop=len(topK)
         state_c,state_h=np.zeros((lenTop,200)),np.zeros((lenTop,200))
         prob=[]
@@ -82,10 +87,10 @@ def beam_search(sess,model,num_generated,seed,dictionary):
             K: default value is 3;  #number of sequences to track
     return: topK candidates of the generated text
     """
-
+    import random
     beam=Beam(hp.K)
     vec=dictionary.text2vec(seed)  # 1xL 
-    state_c,state_h=np.zeros((1,200)),np.zeros((1,200)) # initial states
+    state_c,state_h=np.random.random((1,200)),np.zeros((1,200)) # initial states
     p=1
     beam.addBeam(vec,p,state_c,state_h,[])
 
@@ -101,11 +106,12 @@ def beam_search(sess,model,num_generated,seed,dictionary):
         for i in range(topK.shape[0]):
             for j in range(hp.K):
                 cand=topK[i,j]
-                if cand==1:continue
+                #if cand==1:continue
                 vec=[cand]
                 st_c=state_c[i,:]
                 st_h=state_h[i,:]
-                p=softmax[i,-1,cand]*probs[i]
+#                softmax[i,-1,cand]=softmax[i,-1,cand]/softmax[i,-1,cand].sum()
+                p=softmax[i,-1,cand]*(probs[i])
                 hist=history[i]
                 beam.addBeam(vec,p,st_c,st_h,hist)
     lastOutputs,probs,state_c,state_h,history=beam.getTopK()
@@ -114,6 +120,7 @@ def beam_search(sess,model,num_generated,seed,dictionary):
 def getBestCandidate(sess,model,num_tokens,seed,dictionary):
     history=beam_search(sess,model,num_tokens,seed,dictionary)
     return dictionary.vec2text(history[-1])
+        
 
 if __name__ == "__main__":
     # load dictionary
