@@ -24,16 +24,18 @@ class Dictionary:
         if not os.path.exists('preprocessed'): os.mkdir('preprocessed')
         with codecs.open('{}/{}'.format(fpath,fname), 'w', 'utf-8') as fout:
             fout.write("{}\t1000000000\n{}\t1000000000\n{}\t1000000000\n{}\t1000000000".format(
-                    "<PAD>", "<UNK>" , "<START>",'.'))
+                    "<end>", "<unk>" , "<start>","the"))
             for word, cnt in word2cnt.most_common(len(word2cnt)):
                 fout.write(u"{}\t{}\n".format(word, cnt))
     def load_vocab(self,path,filename):
         vocab = [line.split()[0] for line in codecs.open(path+'/'+filename, 'r', 'utf-8').read().splitlines()]
         vocab = vocab[:10000]
-        self.word2idx = defaultdict(lambda:1,{word: idx for idx, word in enumerate(vocab)})
+        self.word2idx = defaultdict(lambda:self.word2idx['<unk>'],{word: idx for idx, word in enumerate(vocab)})
         self.idx2word = {idx: word for idx, word in enumerate(vocab)}
-    def text2vec(self,text):
-        return [self.word2idx["<START>"]]+[self.word2idx[token] for token in text.split()]
+    def text2vec(self,text,end_token=True):
+        ret= [self.word2idx["<start>"]]+[self.word2idx[token] for token in text.split()]
+        if end_token: ret=ret+[self.word2idx["<end>"]]
+        return ret
     def vec2text(self,vec):
         return ' '.join([self.idx2word[idx] for idx in vec])
 
