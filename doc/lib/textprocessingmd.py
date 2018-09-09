@@ -35,15 +35,15 @@ def text_prepare(text, lower=True, remove_stops=True):
 #### text conversions #####
 def convert_puncs(text):
     """ version 1
-	put spaces before and after each punctuation, for tokenization
+    put spaces before and after each punctuation, for tokenization
     """
     ret=text
     for char in string.punctuation:
-        ret=ret.replace(char,' {} '.format(char))
+        ret=ret.replace(char,' {}'.format(char))
     return ret
 def convert_escapes(text):
     """ version 1
-	replace tabs and endl with special tokens
+    replace tabs and endl with special tokens
     """
     ret=text
     ret=ret.replace('\t',' #tab ')
@@ -51,20 +51,25 @@ def convert_escapes(text):
     return ret
 def restore_escapes(text):
     """ version 1
-	restore the state of space tokens
+    restore the state of space tokens
     """
     ret=text
     ret=ret.replace(' #tab ','\t')
-    ret=ret.replace(' #endl ','\n')
+    ret=ret.replace('#endl','\n>>>>')
     return ret
 def convert_text(text,puncs=True,escapes=True):
     """ version 1
-	combine conversions in one function
+    combine conversions in one function
     """
     ret=text
     if puncs:ret=convert_puncs(ret)
     if escapes:ret=convert_escapes(ret)
     
+    return ret
+def restore_text(text,punc=True, escapes=True):
+    ret=text
+    #if puncs:ret=convert_puncs(ret)
+    if escapes:ret=restore_escapes(ret)
     return ret
 
 if __name__ == "__main__":
