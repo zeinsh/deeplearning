@@ -112,17 +112,22 @@ class LSTMModel():
         self.__compute_loss(n_tags, PAD_index)
         self.__perform_optimization()
         
-    def train_on_batch(self, session, x_batch, y_batch, lengths, learning_rate, dropout_keep_probability):
+    def train_on_batch(self, session, x_batch, y_batch, lengths, learning_rate, dropout_keep_probability ,state_c=None ,state_h=None, zero_state=True):
+        st_c, st_h=state_c, state_h
+        if zero_state:
+            st_h,st_c=np.random.random((lengths.shape[0],hp.n_hidden_rnn)),np.random.random((lengths.shape[0],hp.n_hidden_rnn))
+            #st_h,st_c=np.zeros((lengths.shape[0],hp.n_hidden_rnn)),np.zeros((lengths.shape[0],hp.n_hidden_rnn))
         feed_dict = {self.input_batch: x_batch,
                      self.ground_truth_tags: y_batch,
-                     self.initial_state_h: np.zeros((lengths.shape[0],hp.n_hidden_rnn)),
-                     self.initial_state_c: np.zeros((lengths.shape[0],hp.n_hidden_rnn)),
+                     self.initial_state_h: st_h,
+                     self.initial_state_c: st_c,
                      self.learning_rate_ph: learning_rate,
                      self.dropout_ph: dropout_keep_probability,
                      self.lengths: lengths}
 
-        session.run(self.train_op, feed_dict=feed_dict)
- 
+        _,loss,states=session.run([self.train_op, self.loss,self.states], feed_dict=feed_dict)
+        return np.exp(loss),states
+
     def predict_for_batch(self, session, x_batch,init_c,init_h):
         lengths=np.array([1000000]*len(x_batch))
         feed_dict = {self.input_batch: x_batch,
@@ -132,3 +137,16 @@ class LSTMModel():
         k=3
         softmax, states = session.run([self.softmax_output ,self.states], feed_dict=feed_dict)
         return softmax, states
+    
+    def calculatePerplexity(self, session, x_batch, y_batch, lengths ):
+        init_c, init_h=np.random.random((1,200)),np.zeros((1,200)) # initial states
+        feed_dict = {self.input_batch: x_batch,
+                     self.ground_truth_tags: y_batch,
+                     self.initial_state_h: init_h,
+                     self.initial_state_c: init_c,
+                     self.lengths: lengths}
+        loss, states = session.run([self.loss ,self.states], feed_dict=feed_dict)
+        return loss
+        #loss = session.run([self.loss], feed_dict=feed_dict)
+        #perplexity=np.exp(loss)
+        #return perplexity

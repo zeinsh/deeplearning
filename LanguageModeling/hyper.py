@@ -4,8 +4,10 @@ class HyperParameters:
     VOCFILE='bbc_sports.voc'
     MODEL_CHKPNT_PATH='./model/RNN_LSTM_V1_3.ckpt'
 
+    LOGPATH='./log'
+    LOGFILE='v1_6.log'
     MAXLENGTH=1000  # MAX Length of the document
-    K=3 # beam search
+    K=5 # beam search
     n_hidden_rnn=200
     embedding_dim=200
     

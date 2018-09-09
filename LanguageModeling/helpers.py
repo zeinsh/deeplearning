@@ -89,7 +89,7 @@ def beam_search(sess,model,num_generated,seed,dictionary):
     """
     import random
     beam=Beam(hp.K)
-    vec=dictionary.text2vec(seed)  # 1xL 
+    vec=dictionary.text2vec(seed,end_token=False)  # 1xL 
     state_c,state_h=np.random.random((1,200)),np.zeros((1,200)) # initial states
     p=1
     beam.addBeam(vec,p,state_c,state_h,[])
@@ -106,7 +106,8 @@ def beam_search(sess,model,num_generated,seed,dictionary):
         for i in range(topK.shape[0]):
             for j in range(hp.K):
                 cand=topK[i,j]
-                #if cand==1:continue
+                if cand==dictionary.word2idx['<unk>'] or cand==dictionary.word2idx['$'] or cand==dictionary.word2idx['N']:
+                    continue
                 vec=[cand]
                 st_c=state_c[i,:]
                 st_h=state_h[i,:]
